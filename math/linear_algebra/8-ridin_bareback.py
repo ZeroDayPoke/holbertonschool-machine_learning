@@ -18,8 +18,9 @@ def mat_mul(mat1, mat2):
         I mean honestly what else would it be
     """
     if len(mat1[0]) != len(mat2):
-        return None # sorry fam, this adventure requires two dreadnoughts
-    treasure = [[0 for clue in range(len(mat2[0]))] for clue in range(len(mat1))]
+        #  sorry fam, this adventure requires two dreadnoughts
+        return None
+    treasure = [[0 for clu in range(len(mat2[0]))] for clu in range(len(mat1))]
     for island in range(len(mat1)):
         for x_marks_the_spot in range(len(mat2[0])):
             for dubloon in range(len(mat2)):
