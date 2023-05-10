@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Module that performs element-wise addition, subtraction, multiplication, and division"""
+"""alright pycodestyle... you win"""
 
 
 def np_elementwise(mat1, mat2):
