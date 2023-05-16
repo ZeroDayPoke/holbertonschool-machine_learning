@@ -16,7 +16,7 @@ def poly_integral(poly, C=0):
 
     if not isinstance(C, int):
         return None
-    
+
     if len(poly) == 0:
         return None
 
