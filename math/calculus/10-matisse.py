@@ -8,6 +8,9 @@ def poly_derivative(poly):
     Basically the returned list will be the
     coefficients of the derivative of the polynomial.
     """
+    if not isinstance(poly, list):
+        return None
+
     if not all(isinstance(i, (int, float)) for i in poly):
         return None
 
