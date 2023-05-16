@@ -1,4 +1,4 @@
-#!usr/bin/env python3
+#!/usr/bin/env python3
 """Returns the sum of i^2 for i = 1 to n."""
 
 
