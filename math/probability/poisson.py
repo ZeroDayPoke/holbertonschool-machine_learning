@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Poisson distribution"""
-import math
 
 
 class Poisson:
@@ -34,31 +33,35 @@ class Poisson:
                 raise ValueError('data must contain multiple values')
             self.lambtha = sum(data) / len(data)
 
-    def pmf(self, k):
-        # Convert k to an integer
-        k = int(k)
+    def exponent(self, base, power):
+        """Calculates base to the power of power"""
+        return base ** power
 
-        # If k is negative, it's out of range
+    def factorial(self, k):
+        """Calculates factorial of k"""
+        fact = 1
+        for i in range(1, k + 1):
+            fact *= i
+        return fact
+
+    def pmf(self, k):
+        """Calculate the probability mass function"""
+        k = int(k)
         if k < 0:
             return 0
 
-        # Calculate λ^k (lambda to the power of k)
-        lambtha_to_k = self.lambtha ** k
+        # Calculate each component of the PMF formula
+        lambtha_to_k = self.exponent(self.lambtha, k)
+        # hard coding e^-lambtha 2.71828 since no imports
+        e_to_neg_lambda = self.exponent(2.71828, -self.lambtha)
+        k_factorial = self.factorial(k)
 
-        # Calculate e^-λ (Euler's number to the power of -lambda)
-        e_to_lambda = math.exp(-self.lambtha)
-
-        # Calculate k factorial
-        k_factorial = math.factorial(k)
-
-        # Calculate and return the PMF
-        return (lambtha_to_k * e_to_lambda) / k_factorial
+        # Return the product of lambtha_to_k and e_to_lambda divided by k_factorial
+        return (lambtha_to_k * e_to_neg_lambda) / k_factorial
 
     def cdf(self, k):
-        # Convert k to an integer
+        """Calculate the cumulative distribution function"""
         k = int(k)
-
-        # If k is negative, it's out of range
         if k < 0:
             return 0
 
