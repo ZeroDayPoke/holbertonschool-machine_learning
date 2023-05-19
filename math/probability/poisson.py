@@ -56,7 +56,7 @@ class Poisson:
         e_to_neg_lambda = self.exponent(2.71828, -self.lambtha)
         k_factorial = self.factorial(k)
 
-        # Return the product of lambtha_to_k and e_to_lambda divided by k_factorial
+        # Return PMF value
         return (lambtha_to_k * e_to_neg_lambda) / k_factorial
 
     def cdf(self, k):
