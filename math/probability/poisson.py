@@ -52,7 +52,7 @@ class Poisson:
 
         # Calculate each component of the PMF formula
         lambtha_to_k = self.exponent(self.lambtha, k)
-        # hard coding e^-lambtha 2.71828 since no imports
+        # hard coding e^-lambtha 2.71828 since no mathmod
         e_to_neg_lambda = self.exponent(2.71828, -self.lambtha)
         k_factorial = self.factorial(k)
 
