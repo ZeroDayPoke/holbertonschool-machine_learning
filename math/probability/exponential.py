@@ -28,16 +28,13 @@ class Exponential:
                 raise ValueError('data must contain multiple values')
             self.lambtha = 1 / (sum(data) / len(data))
 
-    def factorial(self, n):
-        fact = 1
-        for i in range(1, n + 1):
-            fact *= i
-        return fact
     def exponent(self, base, power):
-        terms = 50
-        exp_approx = sum([(base**n)/self.factorial(n) for n in range(terms) if n <= power])
-        return exp_approx
+        """Calculates base to the power of power"""
+        return base ** power
+
     def pdf(self, x):
+        """Calculates the value of the PDF for a given time period"""
         if x < 0:
             return 0
-        return self.lambtha * self.exponent(2.718281828459045, -self.lambtha * x)
+        pdf_value = self.lambtha * self.exponent(2.718281828459045, -self.lambtha * x)
+        return float("{:.10f}".format(pdf_value))
