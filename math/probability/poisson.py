@@ -58,7 +58,7 @@ class Poisson:
 
         pmf_value = (lambtha_to_k * e_to_neg_lambda) / k_factorial
         # Return PMF value
-        return format(pmf_value, '.10f')
+        return float("{:.10f}".format(pmf_value))
 
     def cdf(self, k):
         """Calculate the cumulative distribution function"""
@@ -69,4 +69,4 @@ class Poisson:
         # Calculate the CDF by summing the PMFs from 0 to k
         cdf_value = sum(self.pmf(i) for i in range(k + 1))
 
-        return format(cdf_value, '.10f')
+        return float("{:.10f}".format(cdf_value))
