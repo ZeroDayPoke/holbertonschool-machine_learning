@@ -40,4 +40,4 @@ class Exponential:
     def pdf(self, x):
         if x < 0:
             return 0
-        return self.lambtha * self.exponent(self.exponent(2.718281828459045, -self.lambtha), x)
+        return self.lambtha * self.exponent(2.718281828459045, -self.lambtha * x)
