@@ -36,5 +36,5 @@ class Exponential:
         """Calculates the value of the PDF for a given time period"""
         if x < 0:
             return 0
-        pdf_value = self.lambtha * self.exponent(2.718281828459045, -self.lambtha * x)
-        return float("{:.10f}".format(pdf_value))
+        pdf_value = self.lambtha * self.exponent(2.718281828, -self.lambtha * x)
+        return pdf_value
