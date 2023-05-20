@@ -27,3 +27,13 @@ class Exponential:
             if len(data) < 2:
                 raise ValueError('data must contain multiple values')
             self.lambtha = 1 / (sum(data) / len(data))
+
+    def exponent(self, base, power):
+        """Calculates base to the power of power"""
+        return base ** power
+
+    def pdf(self, x):
+        """Calculate the probability density function"""
+        if x < 0:
+            return 0
+        return self.lambtha * self.exponent(2.7182818287, -self.lambtha * x)
