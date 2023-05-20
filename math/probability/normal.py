@@ -54,20 +54,13 @@ class Normal:
     def cdf(self, x):
         """Calculates the value of the CDF for a given x-value"""
         z = self.z_score(x)
-        return (1 + self.erf(z / 2 ** 0.5)) / 2
+        return 0.5 * (1 + self.approx_erf(z / 2 ** 0.5))
 
-    def erf(self, x):
-        """Calculates the error function erf(x)"""
-        a1 = 1
-        a2 = (-1/3)
-        a3 = (1/10)
-        a4 = (-1/42)
-        a5 = (1/216)
-        p = 0.3275911
-
-        sign = 1 if x >= 0 else -1
-        x = abs(x)
-
-        t = 1.0 / (1.0 + p * x)
-        erf_value = sign * (1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * self.exponent(2.0, -x * x))
-        return erf_value
+    def approx_erf(self, x):
+        """Approximates the error function erf(x)"""
+        num_pi = 3.1415926536
+        return (2 / (num_pi ** 0.5)) * (x
+                                        - (x ** 3) / 3
+                                        + (x ** 5) / 10
+                                        - (x ** 7) / 42
+                                        + (x ** 9) / 216)
