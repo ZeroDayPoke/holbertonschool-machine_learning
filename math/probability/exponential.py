@@ -30,14 +30,10 @@ class Exponential:
 
     def exponent(self, base, power):
         """Calculates base to the power of power"""
-        exp = 1.0
-        for _ in range(int(power)):
-            exp *= base
-        return exp
+        return base ** power
 
     def pdf(self, x):
         """Calculate the probability density function"""
         if x < 0:
             return 0
-        e_to_ne_lambtha_x = self.exponent(2.718281828459045, -self.lambtha * x)
-        return self.lambtha * e_to_ne_lambtha_x
+        return self.lambtha * self.exponent(2.7182818284, -self.lambtha * x)
