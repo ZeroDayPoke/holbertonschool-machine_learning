@@ -58,3 +58,11 @@ class Binomial:
         for i in range(1, n + 1):
             fact *= i
         return fact
+
+    def cdf(self, k):
+        """Calculates the value of the CDF for a given number of “successes”"""
+        k = int(k)
+        if k < 0:
+            return 0
+        cdf_value = sum(self.pmf(i) for i in range(k + 1))
+        return cdf_value
