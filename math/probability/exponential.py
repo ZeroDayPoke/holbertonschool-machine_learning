@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """ Exponential distribution """
-import numpy as np
 
 
 class Exponential:
