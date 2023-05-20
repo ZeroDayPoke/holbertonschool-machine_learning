@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """ Exponential distribution """
+import numpy as np
 
 
 class Exponential:
@@ -33,7 +34,7 @@ class Exponential:
         return base ** power
 
     def pdf(self, x):
-        """Calculate the probability density function"""
+        """ Calculates the value of the PDF for a given time period. """
         if x < 0:
             return 0
-        return self.lambtha * self.exponent(2.7182818284, -self.lambtha * x)
+        return self.lambtha * np.exp(-self.lambtha * x)
