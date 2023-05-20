@@ -33,3 +33,28 @@ class Binomial:
             self.p = 1 - variance / mean
             self.n = round(mean / self.p)
             self.p = mean / self.n
+
+    def exponent(self, base, power):
+        """Calculates base to the power of power"""
+        return base ** power
+
+    def pmf(self, k):
+        """Calculates the value of the PMF for a given number of “successes”"""
+        k = int(k)
+        if k < 0 or k > self.n:
+            return 0
+        pmf_value = self._comb(self.n, k)
+        pmf_value *= self.exponent(self.p, k)
+        pmf_value *= self.exponent((1 - self.p), (self.n - k))
+        return pmf_value
+
+    def _comb(self, n, r):
+        """Calculate combination"""
+        return self._fact(n) / (self._fact(r) * self._fact(n - r))
+
+    def _fact(self, n):
+        """Calculate factorial"""
+        fact = 1
+        for i in range(1, n + 1):
+            fact *= i
+        return fact
