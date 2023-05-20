@@ -34,7 +34,7 @@ class Exponential:
 
     def pdf(self, x):
         """Calculates the value of the PDF for a given time period"""
-        num_e = 2.71828182845904523536028747135266249
+        num_e = 2.7182818285
         if x < 0:
             return 0
         pdf_value = self.lambtha * self.exponent(num_e, -self.lambtha * x)
