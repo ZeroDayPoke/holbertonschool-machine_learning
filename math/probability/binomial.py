@@ -18,17 +18,18 @@ class Binomial:
     """
     def __init__(self, data=None, n=1, p=0.5):
         if data is None:
-            if n <= 0:
+            self.n, self.p = n, p
+            if self.n <= 0:
                 raise ValueError('n must be a positive value')
-            if p <= 0 or p >= 1:
+            if self.p <= 0 or self.p >= 1:
                 raise ValueError('p must be greater than 0 and less than 1')
-            self.n = int(n)
-            self.p = float(p)
         else:
             if not isinstance(data, list):
                 raise TypeError('data must be a list')
             if len(data) < 2:
                 raise ValueError('data must contain multiple values')
-            self.p = sum(data)/len(data)/n
-            self.n = round(sum(data)/self.p)
-            self.p = sum(data)/len(data)/self.n
+            mean = sum(data) / len(data)
+            variance = sum((xi - mean) ** 2 for xi in data) / len(data)
+            self.p = 1 - variance / mean
+            self.n = round(mean / self.p)
+            self.p = mean / self.n
