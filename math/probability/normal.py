@@ -50,3 +50,24 @@ class Normal:
         factor2 = ((x - self.mean) ** 2) / (2 * (self.stddev ** 2))
         pdf_value = factor1 * self.exponent(num_e, -factor2)
         return pdf_value
+
+    def cdf(self, x):
+        """Calculates the value of the CDF for a given x-value"""
+        z = self.z_score(x)
+        return (1 + self.erf(z / 2 ** 0.5)) / 2
+
+    def erf(self, x):
+        """Calculates the error function erf(x)"""
+        a1 = 1
+        a2 = (-1/3)
+        a3 = (1/10)
+        a4 = (-1/42)
+        a5 = (1/216)
+        p = 0.3275911
+
+        sign = 1 if x >= 0 else -1
+        x = abs(x)
+
+        t = 1.0 / (1.0 + p * x)
+        erf_value = sign * (1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * self.exponent(2.0, -x * x))
+        return erf_value
