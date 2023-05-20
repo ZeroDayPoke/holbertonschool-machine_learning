@@ -36,4 +36,4 @@ class Exponential:
         """Calculate the probability density function"""
         if x < 0:
             return 0
-        return self.lambtha * self.exponent(2.7182818287, -self.lambtha * x)
+        return self.lambtha * self.exponent(2.7182818284, -self.lambtha * x)
