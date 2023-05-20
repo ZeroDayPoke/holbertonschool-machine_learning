@@ -6,9 +6,9 @@ class Normal:
     """
     Normal distribution
         Args:
-            data (list): List of the data to be used to estimate the distribution
-            mean (float): Expected mean of the data
-            stddev (float): Expected standard deviation of the data
+          data (list): List of the data to be used to estimate the distribution
+          mean (float): Expected mean of the data
+          stddev (float): Expected standard deviation of the data
         Raises:
             ValueError: If stddev is not a positive value
             TypeError: If data is not a list
@@ -29,7 +29,7 @@ class Normal:
             self.mean = sum(data) / len(data)
             sum_of_squares = sum((x - self.mean) ** 2 for x in data)
             self.stddev = (sum_of_squares / len(data)) ** 0.5
-            
+
     def exponent(self, base, power):
         """Calculates base to the power of power"""
         return base ** power
