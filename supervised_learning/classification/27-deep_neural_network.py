@@ -48,7 +48,8 @@ class DeepNeuralNetwork:
                 self.__cache['A' + str(i)] = self.softmax(Zi)
             else:
                 self.__cache['A' + str(i)] = self.sigmoid(Zi)
-        return self.__cache['A' + str(self.__L)], self.__cache
+
+        return self.__cache["A{}".format(self.__L)], self.__cache
 
     def cost(self, Y, A):
         """Cost Function - now uses softmax cross-entropy loss"""
@@ -60,7 +61,7 @@ class DeepNeuralNetwork:
         """Evaluates the neural network’s predictions"""
         A, _ = self.forward_prop(X)
         cost = self.cost(Y, A)
-        prediction = np.argmax(A, axis=0)
+        prediction = np.array(np.argmax(A, axis=0))
         return prediction, cost
 
     def gradient_descent(self, Y, cache, alpha=0.05):
@@ -98,13 +99,9 @@ class DeepNeuralNetwork:
             if step <= 0 or step > iterations:
                 raise ValueError("step must be positive and <= iterations")
 
-        mean = np.mean(X, axis=0)
-        std = np.std(X, axis=0)
-        X_normalized = (X - mean) / std
-
         costs = []
         for i in range(iterations):
-            A, cache = self.forward_prop(X_normalized)
+            A, cache = self.forward_prop(X)
             self.gradient_descent(Y, cache, alpha)
             if i % step == 0 or i == iterations:
                 cost = self.cost(Y, A)
