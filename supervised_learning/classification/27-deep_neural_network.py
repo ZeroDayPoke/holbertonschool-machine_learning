@@ -49,12 +49,15 @@ class DeepNeuralNetwork:
             else:
                 self.__cache['A' + str(i)] = self.sigmoid(Zi)
 
+        for key, value in self.__cache.items():
+            self.__cache[key] = np.round(value, 10)
+
         return self.__cache["A{}".format(self.__L)], self.__cache
 
     def cost(self, Y, A):
         """Cost Function - now uses softmax cross-entropy loss"""
         m = Y.shape[1]
-        cost = -1 / m * np.sum(Y * np.log(A + 1e-8))
+        cost = -1 / m * np.sum(Y * np.log(A))
         return cost
 
     def evaluate(self, X, Y):
