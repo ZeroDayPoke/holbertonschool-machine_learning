@@ -3,6 +3,7 @@
 
 import numpy as np
 
+
 class Neuron:
     """Defines a single neuron performing binary classification"""
     def __init__(self, nx):
