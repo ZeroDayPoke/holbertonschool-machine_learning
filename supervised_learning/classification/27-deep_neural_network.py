@@ -43,19 +43,17 @@ class DeepNeuralNetwork:
         self.__cache['A0'] = X
         for i in range(1, self.__L + 1):
             Zi = np.dot(self.__weights['W' + str(i)],
-                        self.__cache['A' + str(i - 1)]) +\
-                        self.__weights['b' + str(i)]
+                        self.__cache['A' + str(i - 1)]) + self.__weights['b' + str(i)]
             if i == self.__L:
-                # softmax activation for output layer
                 self.__cache['A' + str(i)] = self.softmax(Zi)
             else:
                 self.__cache['A' + str(i)] = self.sigmoid(Zi)
         return self.__cache['A' + str(self.__L)], self.__cache
 
     def cost(self, Y, A):
-        """Cost Function - now uses cross-entropy loss"""
+        """Cost Function - now uses softmax cross-entropy loss"""
         m = Y.shape[1]
-        cost = -1 / m * np.sum(Y * np.log(A))
+        cost = -1 / m * np.sum(Y * np.log(A + 1e-8))
         return cost
 
     def evaluate(self, X, Y):
@@ -99,9 +97,14 @@ class DeepNeuralNetwork:
                 raise TypeError("step must be an integer")
             if step <= 0 or step > iterations:
                 raise ValueError("step must be positive and <= iterations")
+
+        mean = np.mean(X, axis=0)
+        std = np.std(X, axis=0)
+        X_normalized = (X - mean) / std
+
         costs = []
         for i in range(iterations):
-            A, cache = self.forward_prop(X)
+            A, cache = self.forward_prop(X_normalized)
             self.gradient_descent(Y, cache, alpha)
             if i % step == 0 or i == iterations:
                 cost = self.cost(Y, A)
