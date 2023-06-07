@@ -63,16 +63,17 @@ class DeepNeuralNetwork:
         return self.__cache['A' + str(self.__L)], self.__cache
 
     def cost(self, Y, A):
-        """Cost Function - now uses cross-entropy loss"""
+        """Cost Function - now uses softmax cross-entropy loss"""
         m = Y.shape[1]
         cost = -1 / m * np.sum(Y * np.log(A))
+        cost = np.round(cost, 10)
         return cost
 
     def evaluate(self, X, Y):
         """Evaluates the neural network’s predictions"""
         A, _ = self.forward_prop(X)
         cost = self.cost(Y, A)
-        prediction = np.argmax(A, axis=0)
+        prediction = np.where(A == np.amax(A, axis=0), 1, 0)
         return prediction, cost
 
     def gradient_descent(self, Y, cache, alpha=0.05):
