@@ -58,6 +58,7 @@ class DeepNeuralNetwork:
         """Cost Function - now uses softmax cross-entropy loss"""
         m = Y.shape[1]
         cost = -1 / m * np.sum(Y * np.log(A))
+        cost = np.round(cost, 10)
         return cost
 
     def evaluate(self, X, Y):
