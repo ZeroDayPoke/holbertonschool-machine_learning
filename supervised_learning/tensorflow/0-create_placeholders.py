@@ -6,7 +6,8 @@ import tensorflow as tf
 
 def create_placeholders(nx, classes):
     """
-    Function to create placeholders for input data and labels for the neural network.
+    Function to create placeholders for input data
+    and labels for the neural network.
     Arguments:
     nx: int, the number of feature columns in our data
     classes: int, the number of classes in our classifier
