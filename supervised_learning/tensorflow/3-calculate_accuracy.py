@@ -7,11 +7,11 @@ import tensorflow as tf
 def calculate_accuracy(y, y_pred):
     """
     Function to calculate the accuracy of a prediction.
-    
+
     Arguments:
     y: placeholder for the labels of the input data
     y_pred: tensor containing the network’s predictions
-    
+
     Returns:
     a tensor containing the decimal accuracy of the prediction
     """
