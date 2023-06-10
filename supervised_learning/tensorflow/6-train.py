@@ -23,7 +23,6 @@ def train(X_train, Y_train, X_valid, Y_valid,
     train_op = create_train_op(loss, alpha)
 
     init = tf.global_variables_initializer()
-    saver = tf.train.Saver()
 
     with tf.Session() as sess:
         sess.run(init)
@@ -43,4 +42,5 @@ def train(X_train, Y_train, X_valid, Y_valid,
             if i < iterations:
                 sess.run(train_op, feed_dict={x: X_train, y: Y_train})
 
+        saver = tf.train.Saver()
         return saver.save(sess, save_path)
