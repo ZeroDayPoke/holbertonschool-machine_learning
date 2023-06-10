@@ -17,8 +17,8 @@ def create_layer(prev, n, activation):
     layer: tensor, output of the layer
     """
 
-    initializer = tf.contrib.layers.\
-        variance_scaling_initializer(mode="fan_avg")
+    initializer = tf.contrib.layers.variance_scaling_initializer(
+        mode="FAN_AVG")
 
     layer = tf.layers.dense(inputs=prev,
                             units=n,
