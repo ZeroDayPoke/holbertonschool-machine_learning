@@ -17,7 +17,8 @@ def create_layer(prev, n, activation):
     layer: tensor, output of the layer
     """
 
-    initializer = tf.variance_scaling_initializer(mode="FAN_AVG")
+    initializer = tf.contrib.layers.variance_scaling_initializer(
+        mode="FAN_AVG")
 
     layer_name = "layer" + activation.__name__
 
