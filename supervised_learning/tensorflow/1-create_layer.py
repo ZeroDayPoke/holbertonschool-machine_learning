@@ -4,7 +4,7 @@
 import tensorflow as tf
 
 
-def create_layer(prev, n, activation):
+def create_layer(prev, n, activation, i):
     """
     Function to create a layer for the neural network.
 
@@ -20,7 +20,7 @@ def create_layer(prev, n, activation):
     initializer = tf.contrib.layers.variance_scaling_initializer(
         mode="FAN_AVG")
 
-    layer_name = "layer" + activation.__name__
+    layer_name = "layer" + str(i) + "_" + activation.__name__
 
     layer = tf.layers.dense(inputs=prev,
                             units=n,
