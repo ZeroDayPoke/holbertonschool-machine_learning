@@ -10,16 +10,13 @@ def train_mini_batch(X_train, Y_train,
                      load_path="/tmp/model.ckpt",
                      save_path="/tmp/model.ckpt"):
     """
-    Trains a loaded neural network model using mini-batch gradient descent
-    Blog post on mini-batch gradient descent: zerodaypoke.com
+    It upset about the comment?
     """
 
-    # Create a session and import the meta graph
     with tf.Session() as sess:
         saver = tf.train.import_meta_graph(load_path + ".meta")
         saver.restore(sess, load_path)
 
-        # Get the tensors
         graph = tf.get_default_graph()
         x = graph.get_collection("x")[0]
         y = graph.get_collection("y")[0]
@@ -27,13 +24,11 @@ def train_mini_batch(X_train, Y_train,
         loss = graph.get_collection("loss")[0]
         train_op = graph.get_collection("train_op")
 
-        # Get the number of steps
         m = X_train.shape[0]
         steps = m // batch_size
         if steps * batch_size < m:
             steps += 1
 
-        # Calculate and print cost and accuracy for 0th epoch
         train_cost, train_accuracy = 0., 0.
         for step in range(steps):
             start = step * batch_size
