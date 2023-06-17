@@ -32,10 +32,10 @@ def train_mini_batch(X_train, Y_train,
         for epoch in range(epochs + 1):
             X_shuff, Y_shuff = shuffle_data(X_train, Y_train)
 
-            train_cost, train_accuracy = sess.run([loss, accuracy],
-                                                  feed_dict={x: X_train, y: Y_train})
-            valid_cost, valid_accuracy = sess.run([loss, accuracy],
-                                                  feed_dict={x: X_valid, y: Y_valid})
+            train_cost, train_accuracy = sess.run(
+                [loss, accuracy], feed_dict={x: X_train, y: Y_train})
+            valid_cost, valid_accuracy = sess.run(
+                [loss, accuracy], feed_dict={x: X_valid, y: Y_valid})
 
             print("After {} epochs:".format(epoch))
             print("\tTraining Cost: {}".format(train_cost))
@@ -54,8 +54,9 @@ def train_mini_batch(X_train, Y_train,
                     sess.run(train_op, feed_dict={x: X_batch, y: Y_batch})
 
                     if step != 0 and (step + 1) % 100 == 0:
-                        mb_cost, mb_accuracy = sess.run([loss, accuracy],
-                                                        feed_dict={x: X_batch, y: Y_batch})
+                        mb_cost, mb_accuracy = sess.run(
+                            [loss, accuracy],
+                            feed_dict={x: X_batch, y: Y_batch})
                         print("\tStep {}:".format(step + 1))
                         print("\t\tCost: {}".format(mb_cost))
                         print("\t\tAccuracy: {}".format(mb_accuracy))
