@@ -161,9 +161,9 @@ def model(Data_train, Data_valid,
     y_pred = forward_prop(x, layers, activations)
     accuracy = calculate_accuracy(y, y_pred)
     loss = calculate_loss(y, y_pred)
-    train_op = create_Adam_op(loss, alpha, beta1, beta2, epsilon)
-    global_step = tf.Variable(0)
+    global_step = tf.Variable(0, trainable=False)
     alpha = learning_rate_decay(alpha, decay_rate, global_step, 1)
+    train_op = create_Adam_op(loss, alpha, beta1, beta2, epsilon)
     init = tf.global_variables_initializer()
     saver = tf.train.Saver()
 
@@ -174,25 +174,22 @@ def model(Data_train, Data_valid,
             for i in range(0, X_train.shape[0], batch_size):
                 X_batch = X_shuffle[i: i + batch_size]
                 Y_batch = Y_shuffle[i: i + batch_size]
-                sess.run(train_op, feed_dict={x: X_batch, y: Y_batch})
-                if (i / batch_size) % 100 == 0 and i > 0:
-                    train_cost = sess.run(
-                        loss, feed_dict={x: X_train, y: Y_train})
-                    train_accuracy = sess.run(
-                        accuracy, feed_dict={x: X_train, y: Y_train})
-                    print("\tStep {}:".format(i / batch_size))
+                _, step = sess.run([train_op, global_step], feed_dict={x: X_batch, y: Y_batch})
+                if step % 100 == 0:
+                    train_cost = sess.run(loss, feed_dict={x: X_train, y: Y_train})
+                    train_accuracy = sess.run(accuracy, feed_dict={x: X_train, y: Y_train})
+                    print("\tStep {}:".format(step))
                     print("\t\tCost: {}".format(train_cost))
                     print("\t\tAccuracy: {}".format(train_accuracy))
             train_cost = sess.run(loss, feed_dict={x: X_train, y: Y_train})
-            train_accuracy = sess.run(
-                accuracy, feed_dict={x: X_train, y: Y_train})
+            train_accuracy = sess.run(accuracy, feed_dict={x: X_train, y: Y_train})
             valid_cost = sess.run(loss, feed_dict={x: X_valid, y: Y_valid})
-            valid_accuracy = sess.run(
-                accuracy, feed_dict={x: X_valid, y: Y_valid})
+            valid_accuracy = sess.run(accuracy, feed_dict={x: X_valid, y: Y_valid})
             print("After {} epochs:".format(epoch))
             print("\tTraining Cost: {}".format(train_cost))
             print("\tTraining Accuracy: {}".format(train_accuracy))
             print("\tValidation Cost: {}".format(valid_cost))
             print("\tValidation Accuracy: {}".format(valid_accuracy))
+            save_path = saver.save(sess, save_path)
 
         return saver.save(sess, save_path)
