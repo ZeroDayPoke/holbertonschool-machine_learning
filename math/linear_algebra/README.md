@@ -90,6 +90,7 @@ To run the script `0-slice_me_up.py`, use:
 
 ```bash
 ./0-slice_me_up.py
+```
 
 ## Author
 
