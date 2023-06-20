@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
-"""docstring"""
+"""Moving Average"""
 
 
 def moving_average(data, beta):
     """
-    doc
+    Calculates the weighted moving average of a data set.
+
+    Args:
+        data (list): The list of data to calculate the moving average of.
+        beta (float): The weight used for the moving average.
+
+    Returns:
+        list: A list containing the moving averages of data.
     """
     v = 0
     moving_avgs = []

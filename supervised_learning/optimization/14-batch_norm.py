@@ -5,7 +5,15 @@ import tensorflow as tf
 
 def create_batch_norm_layer(prev, n, activation):
     """
-    doc too dangerous for checker
+    Creates a batch normalization layer for a neural network in tensorflow.
+
+    Args:
+        prev (tf.Tensor): The activated output of the previous layer.
+        n (int): The number of nodes in the layer to be created.
+        activation (tf.Operation): The activation function that should be used on the output of the layer.
+
+    Returns:
+        tf.Tensor: A tensor of the activated output for the layer.
     """
     init = tf.contrib.layers.variance_scaling_initializer(mode="FAN_AVG")
 

@@ -10,7 +10,20 @@ def train_mini_batch(X_train, Y_train,
                      load_path="/tmp/model.ckpt",
                      save_path="/tmp/model.ckpt"):
     """
-    It upset about the comment?
+    Trains a loaded neural network model using mini-batch gradient descent.
+
+    Args:
+        X_train (np.ndarray): shape (m, 784) containing the training data.
+        Y_train (np.ndarray): shape (m, 10) containing the training labels.
+        X_valid (np.ndarray): shape (m, 784) containing the validation data.
+        Y_valid (np.ndarray): shape (m, 10) containing the validation labels.
+        batch_size (int): number of data points in a batch.
+        epochs (int): number of times the training should pass through the whole dataset.
+        load_path (str): path from which to load the model.
+        save_path (str): path to where the model should be saved after training.
+
+    Returns:
+        str: the path where the model was saved.
     """
 
     with tf.Session() as sess:

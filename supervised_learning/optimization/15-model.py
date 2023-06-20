@@ -192,4 +192,4 @@ def model(Data_train, Data_valid,
             print("\tValidation Accuracy: {}".format(valid_accuracy))
             save_path = saver.save(sess, save_path)
 
-        return saver.save(sess, save_path)
+        return save_path
