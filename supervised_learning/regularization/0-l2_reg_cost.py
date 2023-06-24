@@ -3,6 +3,7 @@
 
 import numpy as np
 
+
 def l2_reg_cost(cost, lambtha, weights, L, m):
     """
     docstrings to be added post checker

@@ -2,6 +2,7 @@
 """Regular Gradient Descent"""
 import numpy as np
 
+
 def l2_reg_gradient_descent(Y, weights, cache, alpha, lambtha, L):
     """
     docstrings to be added post checker
