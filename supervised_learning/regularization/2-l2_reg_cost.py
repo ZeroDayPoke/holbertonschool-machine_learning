@@ -10,6 +10,7 @@ def l2_reg_cost(cost):
     """
     # Add the L2 regularization losses to the original cost
     l2_cost = cost + \
-        tf.reduce_sum(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
+        tf.reduce_sum(tf.get_collection(
+            tf.GraphKeys.REGULARIZATION_LOSSES), axis=0)
 
     return l2_cost
