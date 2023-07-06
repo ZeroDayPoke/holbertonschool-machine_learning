@@ -4,18 +4,20 @@ Main file
 """
 
 # Force Seed - fix for Keras
+import tensorflow.keras as K
+import tensorflow as tf
+import numpy as np
+import random
+import os
 SEED = 0
 
-import os
 os.environ['PYTHONHASHSEED'] = str(SEED)
-import random
 random.seed(SEED)
-import numpy as np
 np.random.seed(SEED)
-import tensorflow as tf
 tf.set_random_seed(SEED)
-import tensorflow.keras as K
-session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+session_conf = tf.ConfigProto(
+    intra_op_parallelism_threads=1,
+    inter_op_parallelism_threads=1)
 sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
 K.backend.set_session(sess)
 
