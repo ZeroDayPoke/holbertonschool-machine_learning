@@ -7,10 +7,12 @@ def convolve_grayscale_same(images, kernel):
     """Function that performs a same convolution on grayscale images"""
     m, h, w = images.shape
     kh, kw = kernel.shape
-    pad_h = max((kh - 1) // 2, 0)
-    pad_w = max((kw - 1) // 2, 0)
+    pad_h = ((h - 1) * 1 + kh - h) // 2
+    pad_w = ((w - 1) * 1 + kw - w) // 2
     padded_images = np.pad(
-        images, ((0, 0), (pad_h, pad_h), (pad_w, pad_w)), 'constant')
+        images, ((0, 0), (pad_h, pad_h + kh %
+                          2), (pad_w, pad_w + kw %
+                               2)), 'constant')
     output = np.zeros((m, h, w))
     for x in range(h):
         for y in range(w):
