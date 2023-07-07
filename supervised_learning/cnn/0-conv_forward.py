@@ -42,34 +42,32 @@ def conv_forward(A_prev, W, b, activation, padding="same", stride=(1, 1)):
     sh, sw = stride
 
     if padding == "same":
-        pad_h = max((h_prev - 1) * sh + kh - h_prev, 0)
-        pad_w = max((w_prev - 1) * sw + kw - w_prev, 0)
-        pad_h = pad_h // 2 if pad_h % 2 == 0 else pad_h // 2 + 1
-        pad_w = pad_w // 2 if pad_w % 2 == 0 else pad_w // 2 + 1
+        ph = int(np.ceil(((h_prev - 1) * sh + kh - h_prev) / 2))
+        pw = int(np.ceil(((w_prev - 1) * sw + kw - w_prev) / 2))
     else:
-        pad_h = pad_w = 0
+        ph = pw = 0
 
-    h_new = (h_prev - kh + 2 * pad_h) // sh + 1
-    w_new = (w_prev - kw + 2 * pad_w) // sw + 1
+    h_new = (h_prev + 2 * ph - kh) // sh + 1
+    w_new = (w_prev + 2 * pw - kw) // sw + 1
 
-    A_prev_pad = np.pad(A_prev, ((0, 0), (pad_h, pad_h),
-                        (pad_w, pad_w), (0, 0)), 'constant')
+    A_prev_pad = np.pad(
+        A_prev, ((0, 0), (ph, ph), (pw, pw), (0, 0)), 'constant')
     Z = np.zeros((m, h_new, w_new, c_new))
 
-    for i in range(m):
+    for c in range(c_new):
         for h in range(h_new):
             for w in range(w_new):
-                for c in range(c_new):
-                    start_h = h * sh
-                    start_w = w * sw
-                    end_h = start_h + kh
-                    end_w = start_w + kw
+                start_h = h * sh
+                start_w = w * sw
+                end_h = start_h + kh
+                end_w = start_w + kw
 
-                    a_slice = A_prev_pad[i, start_h:end_h, start_w:end_w, :]
-                    weights = W[:, :, :, c]
-                    biases = b[0, 0, 0, c]
+                a_slice = A_prev_pad[:, start_h:end_h, start_w:end_w, :]
+                weights = W[:, :, :, c]
+                biases = b[0, 0, 0, c]
 
-                    Z[i, h, w, c] = np.sum(a_slice * weights) + biases
+                Z[:, h, w, c] = np.sum(
+                    a_slice * weights, axis=(1, 2, 3)) + biases
 
     A = activation(Z)
     return A
