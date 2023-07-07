@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Test"""
+"""Test Model Module"""
 import tensorflow.keras as K
 
 
