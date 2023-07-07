@@ -3,18 +3,19 @@
 Main file
 """
 # Force Seed - fix for Keras
-SEED = 0
-import matplotlib.pyplot as plt
-import os
-os.environ['PYTHONHASHSEED'] = str(SEED)
-import random
-random.seed(SEED)
-import numpy as np
-np.random.seed(SEED)
-import tensorflow as tf
-tf.set_random_seed(SEED)
 import tensorflow.keras as K
-session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+import tensorflow as tf
+import numpy as np
+import random
+import os
+import matplotlib.pyplot as plt
+SEED = 0
+os.environ['PYTHONHASHSEED'] = str(SEED)
+random.seed(SEED)
+np.random.seed(SEED)
+tf.set_random_seed(SEED)
+session_conf = tf.ConfigProto(
+    intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
 sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
 K.backend.set_session(sess)
 
@@ -36,7 +37,7 @@ if __name__ == "__main__":
     batch_size = 32
     epochs = 5
     model.fit(X_train_c, Y_train_oh, batch_size=batch_size, epochs=epochs,
-                       validation_data=(X_valid_c, Y_valid_oh))
+              validation_data=(X_valid_c, Y_valid_oh))
     Y_pred = model.predict(X_valid_c)
     print(Y_pred[0])
     Y_pred = np.argmax(Y_pred, 1)
