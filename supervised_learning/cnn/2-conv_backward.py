@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Module to perform a backward pass over a convolutional layer in a neural network
+Module to perform a backward pass over a
+convolutional layer in a neural network
 """
 
 import numpy as np
@@ -8,7 +9,8 @@ import numpy as np
 
 def conv_backward(dZ, A_prev, W, b, padding="same", stride=(1, 1)):
     """
-    Performs backward propagation over a convolutional layer of a neural network
+    Performs backward propagation over a
+    convolutional layer of a neural network
 
     parameters:
         - dZ [numpy.ndarray of shape (m, h_new, w_new, c_new)]:
