@@ -7,5 +7,4 @@ def test_model(network, data, labels, verbose=True):
     """Function that tests a neural network"""
     if verbose:
         print("Testing model...")
-    loss, accuracy = network.evaluate(data, labels, verbose=verbose)
-    return loss, accuracy
+    return network.evaluate(x=data, y=labels, verbose=verbose)
