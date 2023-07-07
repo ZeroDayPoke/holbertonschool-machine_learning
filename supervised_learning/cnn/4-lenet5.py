@@ -29,12 +29,15 @@ def lenet5(x, y):
         - Fully connected softmax output layer with 10 nodes
 
     All layers requiring initialization should initialize their kernels with
-    the he_normal initialization method: tf.contrib.layers.variance_scaling_initializer()
-    All hidden layers requiring activation should use the relu activation function
+    the he_normal initialization method:
+    tf.contrib.layers.variance_scaling_initializer()
+    All hidden layers requiring activation should
+    use the relu activation function
 
     returns:
         tensor for the softmax activated output
-        training operation that utilizes Adam optimization (with default hyperparameters)
+        training operation that utilizes Adam optimization
+        (with default hyperparameters)
         tensor for the loss of the netowrk
         tensor for the accuracy of the network
     """
