@@ -11,7 +11,8 @@ def identity_block(A_prev, filters):
     X = K.layers.BatchNormalization(axis=3)(X)
     X = K.layers.Activation('relu')(X)
 
-    X = K.layers.Conv2D(F3, (3, 3), padding='same', kernel_initializer='he_normal')(X)
+    X = K.layers.Conv2D(F3, (3, 3), padding='same',
+                        kernel_initializer='he_normal')(X)
     X = K.layers.BatchNormalization(axis=3)(X)
     X = K.layers.Activation('relu')(X)
 
