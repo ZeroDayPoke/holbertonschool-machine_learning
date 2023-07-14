@@ -5,6 +5,7 @@ import tensorflow.keras as K
 dense_block = __import__('5-dense_block').dense_block
 transition_layer = __import__('6-transition_layer').transition_layer
 
+
 def densenet121(growth_rate=32, compression=1.0):
     """Builds the DenseNet-121 architecture"""
 
@@ -42,7 +43,9 @@ def densenet121(growth_rate=32, compression=1.0):
     X, nb_filters = dense_block(X, nb_filters, growth_rate, 16)
 
     # Global Average Pooling
-    X = K.layers.AveragePooling2D((7, 7))(X)
+    X = K.layers.AveragePooling2D(pool_siez=(7, 7),
+                                  padding='valid',
+                                  strides=(1, 1))(X)
     X = K.layers.Dense(1000, activation='softmax',
                        kernel_initializer='he_normal')(X)
 
