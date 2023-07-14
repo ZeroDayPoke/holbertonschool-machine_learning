@@ -46,6 +46,7 @@ def resnet50():
 
     # AVGPOOL
     X = K.layers.AveragePooling2D(padding='valid',
+                                  strides=(7, 7),
                                   pool_size=(2, 2))(X)
 
     # output layer
