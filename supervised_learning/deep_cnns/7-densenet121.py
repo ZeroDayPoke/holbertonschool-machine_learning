@@ -14,7 +14,7 @@ def densenet121(growth_rate=32, compression=1.0):
 
     # Initial Convolution
     X = K.layers.BatchNormalization()(inputs)
-    X = K.layers.ReLU()(X)
+    X = K.layers.Activation('relu')(X)
     X = K.layers.Conv2D(2 * growth_rate, (7, 7), strides=(2, 2),
                         padding='same',
                         kernel_initializer='he_normal')(X)
@@ -43,9 +43,7 @@ def densenet121(growth_rate=32, compression=1.0):
     X, nb_filters = dense_block(X, nb_filters, growth_rate, 16)
 
     # Global Average Pooling
-    X = K.layers.AveragePooling2D(pool_siez=(7, 7),
-                                  padding='valid',
-                                  strides=(1, 1))(X)
+    X = K.layers.AveragePooling2D((7, 7))(X)
     X = K.layers.Dense(1000, activation='softmax',
                        kernel_initializer='he_normal')(X)
 
