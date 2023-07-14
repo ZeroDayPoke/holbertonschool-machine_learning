@@ -1,2 +1,4 @@
 *.pkl
 *.npz
+**/__pycache__/*
+
