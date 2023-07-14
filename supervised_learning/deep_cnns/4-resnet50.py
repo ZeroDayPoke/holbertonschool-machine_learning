@@ -46,12 +46,12 @@ def resnet50():
 
     # output layer
     X = K.layers.Dense(units=1000,
-                    activation='softmax',
-                    kernel_initializer='he_normal',
-                    name='dense')(X)
+                       activation='softmax',
+                       kernel_initializer='he_normal',
+                       name='dense')(X)
 
     # Create model
     model = K.models.Model(inputs=X_input,
-                        outputs=X, name='ResNet50')
+                           outputs=X, name='ResNet50')
 
     return model
