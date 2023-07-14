@@ -8,7 +8,7 @@ def inception_network():
     """Inception Network"""
     X_input = K.Input(shape=(224, 224, 3))
 
-    X = K.layers.Conv2D(64, (7, 7), strides=(2, 2), 
+    X = K.layers.Conv2D(64, (7, 7), strides=(2, 2),
                         padding='same', activation='relu')(X_input)
     X = K.layers.MaxPool2D((3, 3), strides=(2, 2), padding='same')(X)
 
