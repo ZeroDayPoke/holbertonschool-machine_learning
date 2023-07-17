@@ -4,6 +4,10 @@ import tensorflow.keras as K
 inception_block = __import__('0-inception_block').inception_block
 
 
+import tensorflow.keras as K
+inception_block = __import__('0-inception_block').inception_block
+
+
 def inception_network():
     """Inception Network"""
     X_input = K.Input(shape=(224, 224, 3))
@@ -13,7 +17,6 @@ def inception_network():
     X = K.layers.MaxPool2D((3, 3), strides=(2, 2), padding='same')(X)
 
     X = K.layers.Conv2D(192, (3, 3), activation='relu', padding='same')(X)
-    X = K.layers.Conv2D(192, (3, 3), padding='same', activation='relu')(X)
     X = K.layers.MaxPool2D((3, 3), strides=(2, 2), padding='same')(X)
 
     X = inception_block(X, [64, 96, 128, 16, 32, 32])
