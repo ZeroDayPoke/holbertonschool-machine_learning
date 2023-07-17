@@ -12,7 +12,6 @@ def inception_network():
                         padding='same', activation='relu')(X_input)
     X = K.layers.MaxPool2D((3, 3), strides=(2, 2), padding='same')(X)
 
-    X = K.layers.Conv2D(64, (1, 1), activation='relu', padding='same')(X)
     X = K.layers.Conv2D(192, (3, 3), activation='relu', padding='same')(X)
     X = K.layers.MaxPool2D((3, 3), strides=(2, 2), padding='same')(X)
 
