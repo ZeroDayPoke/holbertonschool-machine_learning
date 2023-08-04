@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-""" Yolo class """
+"""generate the forward propagation in the Yolo algorithm using TensorFlow."""
 
 from tensorflow.keras.models import load_model
 import numpy as np
+
 
 class Yolo:
     def __init__(self, model_path, classes_path, class_t, nms_t, anchors):
