@@ -12,7 +12,7 @@ class Yolo:
     Attributes:
         model (Keras model): The Darknet Keras model.
         class_names (list): A list of the class names for the model.
-        class_t (float): The box score threshold for the initial filtering step.
+        class_t (float): The box score threshold for the initial filtering.
         nms_t (float): The IOU threshold for non-max suppression.
         anchors (numpy.ndarray): The anchor boxes.
     """
