@@ -50,7 +50,7 @@ class Yolo:
                 for cx in range(grid_width):
                     for b in range(anchor_boxes):
                         pw, ph = self.anchors[i][b]
-                        
+          
                         bx = (1 / (1 + np.exp(-tx[cy, cx, b]))) + cx
                         by = (1 / (1 + np.exp(-ty[cy, cx, b]))) + cy
                         bw = pw * np.exp(tw[cy, cx, b])
