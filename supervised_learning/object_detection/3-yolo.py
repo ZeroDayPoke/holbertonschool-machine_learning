@@ -153,6 +153,7 @@ class Yolo:
         return box_predictions, predicted_box_classes, predicted_box_scores
 
     def intersection_over_union(self, box1, boxes):
+        """Calculates intersection over union"""
         x1 = np.maximum(box1[0], boxes[:, 0])
         y1 = np.maximum(box1[1], boxes[:, 1])
         x2 = np.minimum(box1[2], boxes[:, 2])
