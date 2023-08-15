@@ -26,7 +26,7 @@ class Yolo:
         self.anchors = anchors
 
     def process_outputs(self, outputs, image_size):
-        """Process Outputs."""
+        """Documentation"""
         boxes = []
         box_confidences = []
         box_class_probs = []
@@ -58,8 +58,8 @@ class Yolo:
 
                         bx /= grid_width
                         by /= grid_height
-                        bw /= self.model.input.shape[1]
-                        bh /= self.model.input.shape[2]
+                        bw /= int(self.model.input.shape[1])
+                        bh /= int(self.model.input.shape[2])
 
                         x1 = (bx - (bw / 2)) * image_size[1]
                         y1 = (by - (bh / 2)) * image_size[0]
