@@ -29,6 +29,16 @@ class Yolo:
         return 1 / (1 + np.exp(-x))
 
     def process_outputs(self, outputs, image_size):
+        """
+        _summary_
+
+        Args:
+            outputs (_type_): _description_
+            image_size (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         boxes = []
         box_confidences = []
         box_class_probs = []
