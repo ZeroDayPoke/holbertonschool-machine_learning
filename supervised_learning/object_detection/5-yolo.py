@@ -201,7 +201,7 @@ class Yolo:
                                        interpolation=cv2.INTER_CUBIC)
 
             # Rescale the image's pixel values to [0, 1]
-            image_rescaled = image_resized / 255.0
+            image_rescaled = image_resized / 255
 
             pimages.append(image_rescaled)
 
