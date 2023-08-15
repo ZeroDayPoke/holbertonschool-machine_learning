@@ -69,8 +69,8 @@ class Yolo:
             # Normalize
             bx /= grid_width
             by /= grid_height
-            bw /= self.model.input.shape[1]
-            bh /= self.model.input.shape[2]
+            bw /= int(self.model.input.shape[1])
+            bh /= int(self.model.input.shape[2])
 
             # Convert (center_x, center_y, width, height) --> (x1, y1, x2, y2)
             x1 = (bx - bw / 2) * image_size[1]
