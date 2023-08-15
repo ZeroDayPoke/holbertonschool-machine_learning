@@ -26,18 +26,7 @@ class Yolo:
         self.anchors = anchors
 
     def process_outputs(self, outputs, image_size):
-        """
-        Process Outputs.
-
-        Args:
-            outputs (list of numpy.ndarray): List of arrays containing the predictions
-                                            from the Darknet model for a single image.
-            image_size (numpy.ndarray): Array containing the image’s original size 
-                                        [image_height, image_width].
-
-        Returns:
-            tuple: (boxes, box_confidences, box_class_probs)
-        """
+        """Process Outputs."""
         boxes = []
         box_confidences = []
         box_class_probs = []
@@ -45,58 +34,43 @@ class Yolo:
         for i, output in enumerate(outputs):
             grid_height, grid_width, anchor_boxes, _ = output.shape
 
-            # Get the meshgrid for the height and width
-            cx = np.tile(np.arange(grid_width), (grid_height, 1)).reshape(grid_height, grid_width, 1)
-            cy = np.tile(np.arange(grid_height), (grid_width, 1)).T.reshape(grid_height, grid_width, 1)
-            
-            cx = cx[..., np.newaxis].repeat(anchor_boxes, axis=-1)
-            cy = cy[..., np.newaxis].repeat(anchor_boxes, axis=-1)
-
             # Box coordinates
             tx = output[..., 0:1]
             ty = output[..., 1:2]
             tw = output[..., 2:3]
             th = output[..., 3:4]
 
-            pw = self.anchors[i, :, 0].reshape(1, 1, anchor_boxes, 1)
-            ph = self.anchors[i, :, 1].reshape(1, 1, anchor_boxes, 1)
+            box_confidence = 1 / (1 + np.exp(-output[..., 4:5]))
+            box_class_prob = 1 / (1 + np.exp(-output[..., 5:]))
 
-            bx = self.sigmoid(tx) + cx
-            by = self.sigmoid(ty) + cy
-            bw = pw * np.exp(tw)
-            bh = ph * np.exp(th)
+            box_confidences.append(box_confidence)
+            box_class_probs.append(box_class_prob)
 
-            # Normalize
-            bx /= grid_width
-            by /= grid_height
-            bw /= float(self.model.input_shape[1])
-            bh /= float(self.model.input_shape[2])
+            for cy in range(grid_height):
+                for cx in range(grid_width):
+                    for b in range(anchor_boxes):
+                        pw, ph = self.anchors[i][b]
+                        
+                        bx = (1 / (1 + np.exp(-tx[cy, cx, b]))) + cx
+                        by = (1 / (1 + np.exp(-ty[cy, cx, b]))) + cy
+                        bw = pw * np.exp(tw[cy, cx, b])
+                        bh = ph * np.exp(th[cy, cx, b])
 
-            # Convert (center_x, center_y, width, height) --> (x1, y1, x2, y2)
-            x1 = (bx - bw / 2) * image_size[1]
-            y1 = (by - bh / 2) * image_size[0]
-            x2 = (bx + bw / 2) * image_size[1]
-            y2 = (by + bh / 2) * image_size[0]
+                        bx /= grid_width
+                        by /= grid_height
+                        bw /= self.model.input.shape[1]
+                        bh /= self.model.input.shape[2]
 
-            # Constrain boxes within the image dimensions
-            x1 = np.clip(x1, 0, image_size[1])
-            y1 = np.clip(y1, 0, image_size[0])
-            x2 = np.clip(x2, 0, image_size[1])
-            y2 = np.clip(y2, 0, image_size[0])
+                        x1 = (bx - (bw / 2)) * image_size[1]
+                        y1 = (by - (bh / 2)) * image_size[0]
+                        x2 = (bx + (bw / 2)) * image_size[1]
+                        y2 = (by + (bh / 2)) * image_size[0]
 
-            box = np.concatenate((x1, y1, x2, y2), axis=-1)
-            boxes.append(box)
+                        tx[cy, cx, b] = x1
+                        ty[cy, cx, b] = y1
+                        tw[cy, cx, b] = x2
+                        th[cy, cx, b] = y2
 
-            # Box confidence
-            confidence = self.sigmoid(output[..., 4:5])
-            box_confidences.append(confidence)
-
-            # Box class probabilities
-            class_probs = self.sigmoid(output[..., 5:])
-            box_class_probs.append(class_probs)
+            boxes.append(np.concatenate((tx, ty, tw, th), axis=-1))
 
         return (boxes, box_confidences, box_class_probs)
-
-    @staticmethod
-    def sigmoid(x):
-        return 1 / (1 + np.exp(-x))
