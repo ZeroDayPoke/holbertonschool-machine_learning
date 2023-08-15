@@ -109,62 +109,58 @@ class Yolo:
         return filtered_boxes, box_classes, box_scores
 
     def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
-        """Apply non-max suppression on bounding boxes."""
+        box_predictions = []
+        predicted_box_classes = []
+        predicted_box_scores = []
 
-        # Sort by box scores
-        sorted_indices = np.argsort(box_scores)[::-1]
-        filtered_boxes = filtered_boxes[sorted_indices]
-        box_classes = box_classes[sorted_indices]
-        box_scores = box_scores[sorted_indices]
+        for c in set(box_classes):
+            idxs = np.where(box_classes == c)
+            class_boxes = filtered_boxes[idxs]
+            class_box_scores = box_scores[idxs]
 
-        n = len(filtered_boxes)
-        keep = []
+            # Sort boxes by score
+            sorted_idxs = np.argsort(class_box_scores)[::-1]
+            class_boxes = class_boxes[sorted_idxs]
+            class_box_scores = class_box_scores[sorted_idxs]
 
-        while filtered_boxes.shape[0]:
-            # The box with highest score
-            i = 0
-            keep.append(i)
+            while len(class_boxes) > 0:
+                box_predictions.append(class_boxes[0])
+                predicted_box_classes.append(c)
+                predicted_box_scores.append(class_box_scores[0])
 
-            # Compute IoU of this box with rest
-            iou = self._iou(filtered_boxes[i], filtered_boxes[1:])
+                if len(class_boxes) == 1:
+                    break
 
-            # Find where overlap is below threshold
-            remove = np.where(iou > self.nms_t)[0] + 1
+                iou = self.intersection_over_union(class_boxes[0],
+                                                   class_boxes[1:])
+                iou_mask = iou < self.nms_t
 
-            # Remove indices of overlapping boxes
-            filtered_boxes = np.delete(filtered_boxes, remove, axis=0)
-            box_classes = np.delete(box_classes, remove, axis=0)
-            box_scores = np.delete(box_scores, remove, axis=0)
+                class_boxes = class_boxes[1:][iou_mask]
+                class_box_scores = class_box_scores[1:][iou_mask]
 
-        # Use keep to filter the boxes, scores, and classes
-        box_predictions = filtered_boxes[keep]
-        predicted_box_classes = box_classes[keep]
-        predicted_box_scores = box_scores[keep]
+        # Convert results into numpy arrays
+        box_predictions = np.array(box_predictions)
+        predicted_box_classes = np.array(predicted_box_classes)
+        predicted_box_scores = np.array(predicted_box_scores)
 
-        return box_predictions, predicted_box_classes, predicted_box_scores
+        # Sort results by box classes and scores
+        sort_idxs = np.lexsort((predicted_box_classes, predicted_box_scores))
 
-    def _iou(self, boxA, boxB_list):
-        """Compute the Intersection Over Union (IoU) of two boxes."""
+        return (box_predictions[sort_idxs],
+                predicted_box_classes[sort_idxs],
+                predicted_box_scores[sort_idxs])
 
-        # Determine the (x, y)-coordinates of the intersection rectangle
-        xA = np.maximum(boxA[0], boxB_list[:, 0])
-        yA = np.maximum(boxA[1], boxB_list[:, 1])
-        xB = np.minimum(boxA[2], boxB_list[:, 2])
-        yB = np.minimum(boxA[3], boxB_list[:, 3])
+    def intersection_over_union(self, box1, boxes):
+        x1 = np.maximum(box1[0], boxes[:, 0])
+        y1 = np.maximum(box1[1], boxes[:, 1])
+        x2 = np.minimum(box1[2], boxes[:, 2])
+        y2 = np.minimum(box1[3], boxes[:, 3])
 
-        # Compute the area of intersection rectangle
-        interArea = np.maximum(0, xB - xA + 1) * np.maximum(0, yB - yA + 1)
+        intersection_area = np.maximum(x2 - x1, 0) * np.maximum(y2 - y1, 0)
 
-        # Compute the area of both the prediction and ground-truth
-        # rectangles
-        boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
-        boxBArea = (boxB_list[:, 2] -
-                    boxB_list[:, 0] + 1) * (boxB_list[:, 3]
-                                            - boxB_list[:, 1] + 1)
+        box1_area = (box1[2] - box1[0]) * (box1[3] - box1[1])
+        boxes_area = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
 
-        # Compute the intersection over union by taking the intersection
-        # area and dividing it by the sum of prediction + ground-truth
-        # areas - the intersection area
-        iou = interArea / (boxAArea + boxBArea - interArea)
+        union_area = box1_area + boxes_area - intersection_area
 
-        return iou
+        return intersection_area / union_area
