@@ -213,7 +213,7 @@ class Yolo:
         for i, box in enumerate(boxes):
             # Draw the bounding box
             cv2.rectangle(image, (int(box[0]), int(box[1])),
-                          (int(box[2]), int(box[3])), (0, 0, 255), 2)
+                          (int(box[2]), int(box[3])), (255, 0, 0), 2)
 
             # Prepare text with class name and box score
             text = "{} {:.2f}".format(self.class_names[box_classes[i]],
