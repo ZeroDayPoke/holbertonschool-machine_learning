@@ -27,77 +27,42 @@ class Yolo:
 
     def sigmoid(self, x):
         """
-        _summary_
-
-        Args:
-            x (_type_): _description_
-
-        Returns:
-            _type_: _description_
+        Sigmoid function.
         """
         return 1 / (1 + np.exp(-x))
 
     def process_outputs(self, outputs, image_size):
         """
-        _summary_
-
-        Args:
-            outputs (_type_): _description_
-            image_size (_type_): _description_
-
-        Returns:
-            _type_: _description_
+        Process Darknet model outputs.
         """
         boxes = []
         box_confidences = []
         box_class_probs = []
 
         for i, output in enumerate(outputs):
-            grid_height, grid_width, anchor_boxes, _ = output.shape
+            boxes.append(output[..., :4])
+            box_confidences.append(self.sigmoid(output[..., 4:5]))
+            box_class_probs.append(self.sigmoid(output[..., 5:]))
 
-            # Box coordinates
-            box = output[..., :4]
-            for j in range(anchor_boxes):
-                anchor = self.anchors[i, j]
-                box[..., j, 0:2] = self.sigmoid(box[..., j, 0:2])
-                box[..., j, 2:4] = np.exp(box[..., j, 2:4]) * anchor
+        image_height, image_width = image_size
+        for i in range(len(boxes)):
+            grid_width = outputs[i].shape[1]
+            grid_height = outputs[i].shape[0]
+            anchor_boxes = outputs[i].shape[2]
 
-            # Box confidence
-            confidence = self.sigmoid(output[..., 4:5])
-
-            # Box class probabilities
-            class_probs = self.sigmoid(output[..., 5:])
-
-            boxes.append(box)
-            box_confidences.append(confidence)
-            box_class_probs.append(class_probs)
-
-        for i, box in enumerate(boxes):
-            grid_height, grid_width, anchor_boxes, _ = box.shape
-
-            # Create a grid
-            c = np.zeros((grid_height, grid_width, anchor_boxes, 1), dtype=int)
-            idx_y = np.arange(grid_height).reshape(grid_height, 1, 1, 1)
-            idx_x = np.arange(grid_width).reshape(1, grid_width, 1, 1)
-            cx = c + idx_x
-            cy = c + idx_y
-
-            # Combine cx and cy
-            cxy = np.concatenate((cx, cy), axis=-1)
-
-            # Set the center of the bounding boxes
-            box[..., :2] = (box[..., :2] + cxy) / (grid_width, grid_height)
-            
-            # Convert (center_x, center_y, width, height) --> (x1, y1, x2, y2)
-            box[..., 0] = box[..., 0] - box[..., 2] / 2
-            box[..., 1] = box[..., 1] - box[..., 3] / 2
-            box[..., 2] = box[..., 0] + box[..., 2]
-            box[..., 3] = box[..., 1] + box[..., 3]
-
-            # Scale to image size
-            box[..., [0, 2]] = box[..., [0, 2]] * image_size[1]
-            box[..., [1, 3]] = box[..., [1, 3]] * image_size[0]
-
-            boxes[i] = box
+            for cy in range(grid_height):
+                for cx in range(grid_width):
+                    for b in range(anchor_boxes):
+                        tx, ty, tw, th = boxes[i][cy, cx, b]
+                        pw, ph = self.anchors[i][b]
+                        bx = (self.sigmoid(tx) + cx) / grid_width
+                        by = (self.sigmoid(ty) + cy) / grid_height
+                        bw = pw * np.exp(tw) / self.model.input.shape[1]
+                        bh = ph * np.exp(th) / self.model.input.shape[2]
+                        x1 = (bx - (bw / 2)) * image_width
+                        y1 = (by - (bh / 2)) * image_height
+                        x2 = (bx + (bw / 2)) * image_width
+                        y2 = (by + (bh / 2)) * image_height
+                        boxes[i][cy, cx, b] = [x1, y1, x2, y2]
 
         return (boxes, box_confidences, box_class_probs)
