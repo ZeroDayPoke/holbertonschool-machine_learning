@@ -31,7 +31,7 @@ class Yolo:
 
         Args:
             outputs (list of numpy.ndarray): List of arrays containing the predictions
-                                             from the Darknet model for a single image.
+                                            from the Darknet model for a single image.
             image_size (numpy.ndarray): Array containing the image’s original size 
                                         [image_height, image_width].
 
@@ -46,8 +46,8 @@ class Yolo:
             grid_height, grid_width, anchor_boxes, _ = output.shape
 
             # Get the meshgrid for the height and width
-            cx = np.arange(grid_width).reshape(1, grid_width, 1).repeat(grid_height, axis=0)
-            cy = np.arange(grid_height).reshape(grid_height, 1, 1).repeat(grid_width, axis=1)
+            cx = np.tile(np.arange(grid_width), (grid_height, 1)).reshape(grid_height, grid_width, 1)
+            cy = np.tile(np.arange(grid_height), (grid_width, 1)).T.reshape(grid_height, grid_width, 1)
             
             cx = cx[..., np.newaxis].repeat(anchor_boxes, axis=-1)
             cy = cy[..., np.newaxis].repeat(anchor_boxes, axis=-1)
@@ -69,8 +69,8 @@ class Yolo:
             # Normalize
             bx /= grid_width
             by /= grid_height
-            bw /= int(self.model.input.shape[1])
-            bh /= int(self.model.input.shape[2])
+            bw /= float(self.model.input_shape[1])
+            bh /= float(self.model.input_shape[2])
 
             # Convert (center_x, center_y, width, height) --> (x1, y1, x2, y2)
             x1 = (bx - bw / 2) * image_size[1]
