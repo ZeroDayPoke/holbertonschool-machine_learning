@@ -109,36 +109,60 @@ class Yolo:
         return filtered_boxes, box_classes, box_scores
 
     def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
-        """NMS"""
+        """Performs non-max suppression"""
+        box_predictions = []
+        predicted_box_classes = []
+        predicted_box_scores = []
 
-        # Flatten the boxes, scores, and classes
-        boxes = tf.reshape(filtered_boxes, (-1, 4))
-        scores = tf.reshape(box_scores, (-1,))
-        classes = tf.reshape(box_classes, (-1,))
+        for c in set(box_classes):
+            idxs = np.where(box_classes == c)
+            class_boxes = filtered_boxes[idxs]
+            class_box_scores = box_scores[idxs]
 
-        # Convert data to float32
-        boxes = tf.cast(boxes, tf.float32)
-        scores = tf.cast(scores, tf.float32)
+            # Sort boxes by score
+            sorted_idxs = np.argsort(class_box_scores)[::-1]
+            class_boxes = class_boxes[sorted_idxs]
+            class_box_scores = class_box_scores[sorted_idxs]
 
-        # Apply NMS
-        selected_indices = tf.image.non_max_suppression(
-            boxes=boxes,
-            scores=scores,
-            max_output_size=filtered_boxes.shape[0],
-            iou_threshold=self.nms_t
-        )
+            while len(class_boxes) > 0:
+                box_predictions.append(class_boxes[0])
+                predicted_box_classes.append(c)
+                predicted_box_scores.append(class_box_scores[0])
 
-        # Gather the selected boxes, scores, and classes
-        box_predictions = tf.gather(boxes, selected_indices)
-        predicted_box_classes = tf.gather(classes, selected_indices)
-        predicted_box_scores = tf.gather(scores, selected_indices)
+                if len(class_boxes) == 1:
+                    break
 
-        # Convert tensors back to numpy arrays
-        with tf.Session() as sess:
-            box_predictions,
-            predicted_box_classes,
-            predicted_box_scores = sess.run([box_predictions,
-                                             predicted_box_classes,
-                                             predicted_box_scores])
+                iou = self.intersection_over_union(class_boxes[0],
+                                                   class_boxes[1:])
+                iou_mask = iou < self.nms_t
 
-        return box_predictions, predicted_box_classes, predicted_box_scores
+                class_boxes = class_boxes[1:][iou_mask]
+                class_box_scores = class_box_scores[1:][iou_mask]
+
+        # Convert results into numpy arrays
+        box_predictions = np.array(box_predictions)
+        predicted_box_classes = np.array(predicted_box_classes)
+        predicted_box_scores = np.array(predicted_box_scores)
+
+        # Sort results by box classes and scores
+        sort_idxs = np.lexsort((predicted_box_scores, predicted_box_classes))
+
+        return (box_predictions[sort_idxs],
+                predicted_box_classes[sort_idxs],
+                predicted_box_scores[sort_idxs])
+
+    def intersection_over_union(self, box1, boxes):
+        """Calculates the intersection over union of two sets of boxes"""
+        x1 = np.maximum(box1[0], boxes[:, 0])
+        y1 = np.maximum(box1[1], boxes[:, 1])
+        x2 = np.minimum(box1[2], boxes[:, 2])
+        y2 = np.minimum(box1[3], boxes[:, 3])
+
+        intersection_area = np.maximum(x2 - x1, 0) * np.maximum(y2 - y1, 0)
+
+        box1_area = (box1[2] - box1[0]) * (box1[3] - box1[1])
+        boxes_area = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
+
+        union_area = box1_area + boxes_area - intersection_area
+
+        return intersection_area / union_area
