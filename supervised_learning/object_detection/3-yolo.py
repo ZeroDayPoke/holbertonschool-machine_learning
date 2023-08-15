@@ -109,62 +109,36 @@ class Yolo:
         return filtered_boxes, box_classes, box_scores
 
     def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
-        """Apply non-max suppression on bounding boxes."""
+        """NMS"""
 
-        # Sort by box scores
-        sorted_indices = np.argsort(box_scores)[::-1]
-        filtered_boxes = filtered_boxes[sorted_indices]
-        box_classes = box_classes[sorted_indices]
-        box_scores = box_scores[sorted_indices]
+        # Flatten the boxes, scores, and classes
+        boxes = tf.reshape(filtered_boxes, (-1, 4))
+        scores = tf.reshape(box_scores, (-1,))
+        classes = tf.reshape(box_classes, (-1,))
 
-        n = len(filtered_boxes)
-        keep = []
+        # Convert data to float32
+        boxes = tf.cast(boxes, tf.float32)
+        scores = tf.cast(scores, tf.float32)
 
-        while filtered_boxes.shape[0]:
-            # The box with highest score
-            i = 0
-            keep.append(i)
+        # Apply NMS
+        selected_indices = tf.image.non_max_suppression(
+            boxes=boxes,
+            scores=scores,
+            max_output_size=filtered_boxes.shape[0],
+            iou_threshold=self.nms_t
+        )
 
-            # Compute IoU of this box with rest
-            iou = self._iou(filtered_boxes[i], filtered_boxes[1:])
+        # Gather the selected boxes, scores, and classes
+        box_predictions = tf.gather(boxes, selected_indices)
+        predicted_box_classes = tf.gather(classes, selected_indices)
+        predicted_box_scores = tf.gather(scores, selected_indices)
 
-            # Find where overlap is below threshold
-            remove = np.where(iou > self.nms_t)[0] + 1
-
-            # Remove indices of overlapping boxes
-            filtered_boxes = np.delete(filtered_boxes, remove, axis=0)
-            box_classes = np.delete(box_classes, remove, axis=0)
-            box_scores = np.delete(box_scores, remove, axis=0)
-
-        # Use keep to filter the boxes, scores, and classes
-        box_predictions = filtered_boxes[keep]
-        predicted_box_classes = box_classes[keep]
-        predicted_box_scores = box_scores[keep]
+        # Convert tensors back to numpy arrays
+        with tf.Session() as sess:
+            box_predictions,
+            predicted_box_classes,
+            predicted_box_scores = sess.run([box_predictions,
+                                             predicted_box_classes,
+                                             predicted_box_scores])
 
         return box_predictions, predicted_box_classes, predicted_box_scores
-
-    def _iou(self, boxA, boxB_list):
-        """Compute the Intersection Over Union (IoU) of two boxes."""
-
-        # Determine the (x, y)-coordinates of the intersection rectangle
-        xA = np.maximum(boxA[0], boxB_list[:, 0])
-        yA = np.maximum(boxA[1], boxB_list[:, 1])
-        xB = np.minimum(boxA[2], boxB_list[:, 2])
-        yB = np.minimum(boxA[3], boxB_list[:, 3])
-
-        # Compute the area of intersection rectangle
-        interArea = np.maximum(0, xB - xA + 1) * np.maximum(0, yB - yA + 1)
-
-        # Compute the area of both the prediction and ground-truth
-        # rectangles
-        boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
-        boxBArea = (boxB_list[:, 2] -
-                    boxB_list[:, 0] + 1) * (boxB_list[:, 3]
-                                            - boxB_list[:, 1] + 1)
-
-        # Compute the intersection over union by taking the intersection
-        # area and dividing it by the sum of prediction + ground-truth
-        # areas - the intersection area
-        iou = interArea / (boxAArea + boxBArea - interArea)
-
-        return iou
