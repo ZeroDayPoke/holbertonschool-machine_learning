@@ -25,21 +25,9 @@ class Yolo:
         self.nms_t = nms_t
         self.anchors = anchors
 
-    def sigmoid(self, x):
-        """
-        _summary_
-
-        Args:
-            x (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """
-        return 1 / (1 + np.exp(-x))
-
     def process_outputs(self, outputs, image_size):
         """
-        _summary_
+        Process Outputs.
 
         Args:
             outputs (_type_): _description_
@@ -56,44 +44,38 @@ class Yolo:
             grid_height, grid_width, anchor_boxes, _ = output.shape
 
             # Box coordinates
-            box = output[..., :4]
-            for j in range(anchor_boxes):
-                anchor = self.anchors[i, j]
-                box[..., j, 0:2] = self.sigmoid(box[..., j, 0:2])
-                box[..., j, 2:4] = np.exp(box[..., j, 2:4]) * anchor
+            tx = self.sigmoid(output[..., 0:1])
+            ty = self.sigmoid(output[..., 1:2])
+            tw = output[..., 2:3]
+            th = output[..., 3:4]
+
+            pw = self.anchors[i, :, 0].reshape(1, 1, anchor_boxes, 1)
+            ph = self.anchors[i, :, 1].reshape(1, 1, anchor_boxes, 1)
+
+            bx = tx
+            by = ty
+            bw = pw * np.exp(tw)
+            bh = ph * np.exp(th)
+
+            # Convert (center_x, center_y, width, height) --> (x1, y1, x2, y2)
+            x1 = bx - bw / 2
+            y1 = by - bh / 2
+            x2 = bx + bw / 2
+            y2 = by + bh / 2
+
+            box = np.concatenate((x1, y1, x2, y2), axis=-1)
+            boxes.append(box)
 
             # Box confidence
             confidence = self.sigmoid(output[..., 4:5])
+            box_confidences.append(confidence)
 
             # Box class probabilities
             class_probs = self.sigmoid(output[..., 5:])
-
-            boxes.append(box)
-            box_confidences.append(confidence)
             box_class_probs.append(class_probs)
 
-        for i, box in enumerate(boxes):
-            grid_height, grid_width, anchor_boxes, _ = box.shape
-
-            # Create a grid
-            c = np.zeros((grid_height, grid_width, anchor_boxes, 1), dtype=int)
-            idx_y = np.arange(grid_height).reshape(grid_height, 1, 1, 1)
-            idx_x = np.arange(grid_width).reshape(1, grid_width, 1, 1)
-            cx = c + idx_x
-            cy = c + idx_y
-
-            # Combine cx and cy
-            cxy = np.concatenate((cx, cy), axis=-1)
-
-            # Set the center of the bounding boxes
-            box[..., :2] = (box[..., :2] + cxy) / (grid_width, grid_height)
-
-            # Convert (center_x, center_y, width, height) --> (x1, y1, x2, y2)
-            box[..., 0] = box[..., 0] - box[..., 2] / 2
-            box[..., 1] = box[..., 1] - box[..., 3] / 2
-            box[..., 2] = box[..., 0] + box[..., 2]
-            box[..., 3] = box[..., 1] + box[..., 3]
-
-            boxes[i] = box
-
         return (boxes, box_confidences, box_class_probs)
+
+    @staticmethod
+    def sigmoid(x):
+        return 1 / (1 + np.exp(-x))
