@@ -86,12 +86,15 @@ class Yolo:
         box_class_scores = [np.max(box_score, axis=-1) for box_score in box_scores]
         
         # Filtering the boxes
-        prediction_mask = [box_class_score >= self.class_t for box_class_score in box_class_scores]
+        prediction_mask = [box_class_score >= self.class_t 
+                           for box_class_score in box_class_scores]
 
         # Using the mask to filter out boxes, their classes and scores
-        filtered_boxes = [box[prediction_mask[i]] for i, box in enumerate(boxes)]
-        box_classes = [box_class[prediction_mask[i]] for i, box_class in enumerate(box_classes)]
-        box_scores = [box_class_score[prediction_mask[i]] for i, box_class_score in enumerate(box_class_scores)]
+        filtered_boxes = [box[mask] for box, mask in zip(boxes, prediction_mask)]
+        box_classes = [box_class[mask] 
+                       for box_class, mask in zip(box_classes, prediction_mask)]
+        box_scores = [box_class_score[mask] 
+                      for box_class_score, mask in zip(box_class_scores, prediction_mask)]
 
         # Flatten the filtered boxes, classes and scores
         filtered_boxes = np.concatenate(filtered_boxes)
