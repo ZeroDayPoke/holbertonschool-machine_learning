@@ -145,7 +145,7 @@ class Yolo:
         predicted_box_scores = np.array(predicted_box_scores)
 
         # Sort results by box classes and scores
-        sort_idxs = np.lexsort((predicted_box_scores, predicted_box_classes))
+        sort_idxs = np.lexsort((predicted_box_classes, predicted_box_scores))
 
         return (box_predictions[sort_idxs],
                 predicted_box_classes[sort_idxs],
