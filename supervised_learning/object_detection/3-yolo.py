@@ -109,11 +109,14 @@ class Yolo:
         return filtered_boxes, box_classes, box_scores
 
     def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
+        """Performs non-max suppression"""
         box_predictions = []
         predicted_box_classes = []
         predicted_box_scores = []
 
-        for c in set(box_classes):
+        unique_classes = set(box_classes)
+
+        for c in unique_classes:
             idxs = np.where(box_classes == c)
             class_boxes = filtered_boxes[idxs]
             class_box_scores = box_scores[idxs]
@@ -124,17 +127,21 @@ class Yolo:
             class_box_scores = class_box_scores[sorted_idxs]
 
             while len(class_boxes) > 0:
+                # Take the box with the highest score
                 box_predictions.append(class_boxes[0])
                 predicted_box_classes.append(c)
                 predicted_box_scores.append(class_box_scores[0])
 
+                # If only one box left, break
                 if len(class_boxes) == 1:
                     break
 
+                # Calculate IOU for the remaining boxes with the top box
                 iou = self.intersection_over_union(class_boxes[0],
                                                    class_boxes[1:])
                 iou_mask = iou < self.nms_t
 
+                # Update class_boxes and class_box_scores using the iou_mask
                 class_boxes = class_boxes[1:][iou_mask]
                 class_box_scores = class_box_scores[1:][iou_mask]
 
@@ -143,12 +150,7 @@ class Yolo:
         predicted_box_classes = np.array(predicted_box_classes)
         predicted_box_scores = np.array(predicted_box_scores)
 
-        # Sort results by box classes and scores
-        sort_idxs = np.lexsort((predicted_box_classes, predicted_box_scores))
-
-        return (box_predictions[sort_idxs],
-                predicted_box_classes[sort_idxs],
-                predicted_box_scores[sort_idxs])
+        return box_predictions, predicted_box_classes, predicted_box_scores
 
     def intersection_over_union(self, box1, boxes):
         x1 = np.maximum(box1[0], boxes[:, 0])
