@@ -26,6 +26,15 @@ class Yolo:
         self.anchors = anchors
 
     def sigmoid(self, x):
+        """
+        _summary_
+
+        Args:
+            x (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         return 1 / (1 + np.exp(-x))
 
     def process_outputs(self, outputs, image_size):
@@ -78,12 +87,16 @@ class Yolo:
 
             # Set the center of the bounding boxes
             box[..., :2] = (box[..., :2] + cxy) / (grid_width, grid_height)
-
+            
             # Convert (center_x, center_y, width, height) --> (x1, y1, x2, y2)
             box[..., 0] = box[..., 0] - box[..., 2] / 2
             box[..., 1] = box[..., 1] - box[..., 3] / 2
             box[..., 2] = box[..., 0] + box[..., 2]
             box[..., 3] = box[..., 1] + box[..., 3]
+
+            # Scale to image size
+            box[..., [0, 2]] = box[..., [0, 2]] * image_size[1]
+            box[..., [1, 3]] = box[..., [1, 3]] * image_size[0]
 
             boxes[i] = box
 
