@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Object Detection - 1. Yolo"""
+"""Object Detection - 2. Yolo"""
 
 import tensorflow as tf
 from tensorflow.keras.models import load_model
