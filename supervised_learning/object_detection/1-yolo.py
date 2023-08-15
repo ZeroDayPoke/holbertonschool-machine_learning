@@ -30,11 +30,13 @@ class Yolo:
         Process Outputs.
 
         Args:
-            outputs (_type_): _description_
-            image_size (_type_): _description_
+            outputs (list of numpy.ndarray): List of arrays containing the predictions
+                                             from the Darknet model for a single image.
+            image_size (numpy.ndarray): Array containing the image’s original size 
+                                        [image_height, image_width].
 
         Returns:
-            _type_: _description_
+            tuple: (boxes, box_confidences, box_class_probs)
         """
         boxes = []
         box_confidences = []
@@ -43,25 +45,44 @@ class Yolo:
         for i, output in enumerate(outputs):
             grid_height, grid_width, anchor_boxes, _ = output.shape
 
+            # Get the meshgrid for the height and width
+            cx = np.arange(grid_width).reshape(1, grid_width, 1).repeat(grid_height, axis=0)
+            cy = np.arange(grid_height).reshape(grid_height, 1, 1).repeat(grid_width, axis=1)
+            
+            cx = cx[..., np.newaxis].repeat(anchor_boxes, axis=-1)
+            cy = cy[..., np.newaxis].repeat(anchor_boxes, axis=-1)
+
             # Box coordinates
-            tx = self.sigmoid(output[..., 0:1])
-            ty = self.sigmoid(output[..., 1:2])
+            tx = output[..., 0:1]
+            ty = output[..., 1:2]
             tw = output[..., 2:3]
             th = output[..., 3:4]
 
             pw = self.anchors[i, :, 0].reshape(1, 1, anchor_boxes, 1)
             ph = self.anchors[i, :, 1].reshape(1, 1, anchor_boxes, 1)
 
-            bx = tx
-            by = ty
+            bx = self.sigmoid(tx) + cx
+            by = self.sigmoid(ty) + cy
             bw = pw * np.exp(tw)
             bh = ph * np.exp(th)
 
+            # Normalize
+            bx /= grid_width
+            by /= grid_height
+            bw /= self.model.input.shape[1]
+            bh /= self.model.input.shape[2]
+
             # Convert (center_x, center_y, width, height) --> (x1, y1, x2, y2)
-            x1 = bx - bw / 2
-            y1 = by - bh / 2
-            x2 = bx + bw / 2
-            y2 = by + bh / 2
+            x1 = (bx - bw / 2) * image_size[1]
+            y1 = (by - bh / 2) * image_size[0]
+            x2 = (bx + bw / 2) * image_size[1]
+            y2 = (by + bh / 2) * image_size[0]
+
+            # Constrain boxes within the image dimensions
+            x1 = np.clip(x1, 0, image_size[1])
+            y1 = np.clip(y1, 0, image_size[0])
+            x2 = np.clip(x2, 0, image_size[1])
+            y2 = np.clip(y2, 0, image_size[0])
 
             box = np.concatenate((x1, y1, x2, y2), axis=-1)
             boxes.append(box)
